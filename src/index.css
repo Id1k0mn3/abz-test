@@ -1,0 +1,41 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  
+  --ui-base-white: #FFF;
+  --ui-base-black: #000;
+
+  --ui-var-black-87: rgba(0, 0, 0, 0.87);
+
+  --ui-var-blue: #00BDD3;
+
+  --ui-var-yellow: #F4E041;
+  --ui-var-lightyellow: #FFE302;
+
+  --ui-var-lightgrey: #F8F8F8;
+  --ui-var-light-grey-2: #D0CFCF;
+  --ui-var-darkgrey: #B4B4B4;
+  --ui-var-darkgrey-2: #7E7E7E;
+
+  --ui-var-red: #CB3D40;
+}
+
+* {
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--ui-var-lightgrey);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: calc(26 / 16);
+}
+
+li {
+ list-style-type: none;
+}
