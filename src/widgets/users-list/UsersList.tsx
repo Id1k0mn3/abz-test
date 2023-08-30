@@ -10,7 +10,6 @@ export const UsersList = () => {
   const [usersArray, setUsers] = useState<UserGet[]>([])
   const [nextUrl, setNextUrl] = useState<string>();
   const [isHideButton, setIsHideButton] = useState<boolean>(false);
-  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false);
   const userState = useUsers(state => state.users);
 
   const sortUsers = (array: UserGet[]) => {
@@ -33,7 +32,7 @@ export const UsersList = () => {
         const { users, links: { next_url } } = data.data;
 
         if (!next_url) {
-          setButtonDisabled(true);
+          setIsHideButton(true);
           return;
         }
 
@@ -63,6 +62,7 @@ export const UsersList = () => {
     const users = sortUsers(userState);
     const sortedUsersDesc = [...users].sort((user1, user2) => user2.registration_timestamp - user1.registration_timestamp);
     setUsers(sortedUsersDesc);
+    setIsHideButton(false)
   }, [userState]);
 
   return(
@@ -75,7 +75,7 @@ export const UsersList = () => {
         )}
       </UsersListStyled>
 
-      {!isHideButton && <Button onClick={getUsers} disabled={isButtonDisabled}>Show more</Button>}
+      {!isHideButton && <Button onClick={getUsers}>Show more</Button>}
     </UserListWrapper>
   )
 }

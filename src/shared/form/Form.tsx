@@ -5,6 +5,7 @@ import userService from "../services/user.service";
 import { UserPosition } from "../../types";
 import { Button } from "../UI";
 import { useUsers } from '../state/UserState';
+import { useFormState } from '../state/FormState';
 import {
   FormStyles,
   FormControl,
@@ -49,7 +50,7 @@ export const Form = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
   const thereIsFieldWithError: boolean = !!errors.email || !!errors.photo || !!errors.name || !!errors.phone;
   const updateUsers = useUsers(state => state.updateUsers)
-  const userState = useUsers(state => state.users);
+  const updateFormState =useFormState(state => state.uspdateIsSubmitted)
   
   const name = watch('name');
   const email = watch('email');
@@ -110,6 +111,7 @@ export const Form = () => {
   const updateStateUsers = () => {
     userService.getUsers().then(({ data: { users } }) => {
       updateUsers(users);
+      updateFormState(true)
     });
   };
 
