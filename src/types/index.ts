@@ -1,8 +1,9 @@
-import { type User, type UserPosition } from '../types/User.interface';
+import { type UserGet, UserCreate, type UserPosition } from '../types/User.interface';
 import { type Token } from '../types/Global.interface';
 
 export {
-  User,
+  UserGet,
+  UserCreate,
   UserPosition,
   Token,
 }

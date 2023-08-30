@@ -31,6 +31,7 @@ export const FormStyles = styled.form`
 export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   row-gap: 50px;
 `;
 
@@ -39,14 +40,14 @@ export const FormControl = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  row-gap: 4px;
+  row-gap: .25rem;
 `;
 
 export const FormControlLabelWrapper = styled.div`
   position: absolute;
   top: -12px;
   left: 12px;
-  padding: 0 4px;
+  padding: 0 .25rem;
   background: var(--ui-var-lightgrey);
 `;
 
@@ -60,7 +61,8 @@ export const FormControlLabel = styled.label<LabelProps>`
 export const FormControlField = styled.input<FieldProps>`
   display: ${(props) => props.isHidden ? 'none' : 'revert'};
   width: 100%;
-  padding: 12px 14px;
+  height: 54px;
+  padding: 11px 15px;
   font-weight: 400;
   font-size: 1rem;
   line-height: calc(26 / 16);
@@ -88,7 +90,7 @@ export const FormPositionGroup = styled.div`
   flex-direction: column;
   width: 100%;
   margin: 25px 0 47px 0; 
-  row-gap: 11px;
+  row-gap: 9px;
 `;
 
 export const FormPositionGroupTitle = styled(Paragraph)`
@@ -100,7 +102,11 @@ export const FormControlHint = styled(FormControlLabel)`
   font-weight: 400;
 `;
 
-export const FormPositionsList = styled.ul``;
+export const FormPositionsList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px;
+`;
 
 export const FormPositionsListItem = styled.li``;
 
@@ -114,15 +120,16 @@ export const FormRadioLabel = styled.label`
   position: relative;
   display: flex;
   align-items: center;
+  min-height: 27px;
   column-gap: .75rem;
 
   &::after {
     position: absolute;
     top: 50%;
-    left: 6px;
+    left: 5px;
     display: block;
-    width: 10px;
-    height: 10px;
+    width: .625rem;
+    height: .625rem;
     background: transparent;
     border-radius: 50%;
     transform: translateY(-50%);
@@ -131,8 +138,8 @@ export const FormRadioLabel = styled.label`
 
   &::before {
     display: block;
-    width: 20px;
-    height: 20px;
+    width: 1.125rem;
+    height: 1.125rem;
     border: 1px solid var(--ui-var-light-grey-2);
     border-radius: 50%;
     content: '';
@@ -156,27 +163,31 @@ export const FormRadioHidden = styled.input`
 export const FormControlInner = styled.div`
   display: flex;
   width: 100%;
-  border-radius: 4px;
+  border-radius: .25rem;
 `;
 
 export const FormControlPrependElement = styled.span<PrependElement>`
   display: block;
-  padding: 13px 15px;
+  padding: 13px 15px 13px 14px;
   color: var(--ui-var-black-87);
   border: ${(props) => props.isError ? '2px solid var(--ui-var-red)' : '1px solid var(--ui-var-black-87);'};
-  border-radius: 4px 0 0 4px;
+  border-radius: .25rem 0 0 .25rem;
 `;
 
 export const FormControlCustomFileField = styled.label<LabelProps>`
   flex-grow: 1;
   padding: 13px 16px;
   border-width: ${(props) => props.isError ? '2px 2px 2px 0' : '1px 1px 1px 0'};
-  border-color: ${(props) => props.isError ? 'var(--ui-var-red)' : 'var(--ui-var-darkgrey-2)'};
+  border-color: ${(props) => props.isError ? 'var(--ui-var-red)' : 'var(--ui-var-light-grey-2)'};
   border-style: solid;
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 .25rem .25rem 0;
 `;
 
 export const FormControlCustomPlaceholder = styled(Paragraph)`
   color: var(--ui-var-darkgrey-2);
   text-align: left;
 `;
+
+export const FormWrapperButton = styled.div`
+  margin-top: 50px;
+`

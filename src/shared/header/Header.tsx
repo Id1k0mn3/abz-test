@@ -9,7 +9,7 @@ export const Header: React.FC = () => {
     <HeaderStyles>
       <Container hasPaddings={true}>
         <HeaderContent>
-          <img src={logo} alt="" />
+          <img src={logo} alt="logo" />
           <HeaderActions>
             <Button>Users</Button>
             <Button>Sign up</Button>

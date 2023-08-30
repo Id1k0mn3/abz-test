@@ -1,9 +1,10 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import globalService from "../services/global.service";
 import userService from "../services/user.service";
 import { UserPosition } from "../../types";
 import { Button } from "../UI";
+import { useUsers } from '../state/UserState';
 import {
   FormStyles,
   FormControl,
@@ -24,14 +25,15 @@ import {
   FormControlPrependElement,
   FormControlCustomFileField,
   FormControlCustomPlaceholder,
+  FormWrapperButton,
 } from "./FormStyles";
 
 type Inputs = {
   name: string,
   phone: string,
   email: string,
-  position: string,
-  file: string,
+  position_id: string,
+  photo: File | undefined,
 };
 
 interface UserPositionsResponse {
@@ -39,19 +41,23 @@ interface UserPositionsResponse {
 };
 
 export const Form = () => {
+  const MAX_FILE_SIZE = (1024 * 1024) * 5;
   const [userToken, setUserToken] = useState<string>('');
+  const [blobImage, setBlobImage] = useState<File>();
+  const [fileSizeError, setfileSizeError] = useState<boolean>(false);
   const [userPositions, setUserPositions] = useState<UserPosition[]>([]);
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
-
-  const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
-
+  const thereIsFieldWithError: boolean = !!errors.email || !!errors.photo || !!errors.name || !!errors.phone;
+  const updateUsers = useUsers(state => state.updateUsers)
+  const userState = useUsers(state => state.users);
+  
   const name = watch('name');
   const email = watch('email');
   const phone = watch('phone');
-
+  
   useEffect(() => {
     globalService.getToken()
-      .then(({ data: {token} }) => {
+      .then(({ data: { token } }) => {
         setUserToken(token);
       }).catch((e) => {
         console.error(e);
@@ -59,16 +65,71 @@ export const Form = () => {
 
     userService.getUserPositions()
       .then(({ data: { positions } }) => {
-        console.log(positions);
         setUserPositions(positions);
       }).catch((e) => {
         console.error(e);
       })
   }, [])
 
-  const checkImageSize = (event) => {
-    console.log(event);
+  const checkImageSize = (event: FormEvent<HTMLInputElement>) => {
+    const reader = new FileReader();
+    const { files } = event.target as HTMLInputElement;
+    const file = files[0];
+
+    if (file.size > MAX_FILE_SIZE) {
+      setfileSizeError(true);
+      return
+    }
+    
+    setfileSizeError(false);
+
+    reader.onloadend = (readerEvent) => {
+      const image = new Image();
+      const { result } = readerEvent.target;
+      image.src = result;
+
+      image.onload = function() {
+        if (image.width < 70 && image.height < 70) {
+          return;
+        }
+      };
+      
+      const imageBlobData = (image.src).split(',')[1];
+
+      if (!imageBlobData) {
+        console.error('problem with convert image.src to image blob data');
+        return;
+      }
+
+      setBlobImage(file);
+    };
+
+    reader.readAsDataURL(file);
   };
+
+  const updateStateUsers = () => {
+    userService.getUsers().then(({ data: { users } }) => {
+      updateUsers(users);
+    });
+  };
+
+  const onSubmit: SubmitHandler<Inputs> = async data => {
+    try {
+      const formData  = new FormData();
+      data.photo = blobImage;
+        
+      for(const name in data) {
+        formData.append(name, data[name]);
+      }
+
+      await userService.createUser(formData, { Token: userToken})
+
+      updateStateUsers();
+    } catch(e) {
+      console.error(`there is some error in method onSubmit => ${e}`);
+    }
+  };
+
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <FormStyles onSubmit={handleSubmit(onSubmit)}>
@@ -79,7 +140,12 @@ export const Form = () => {
                 <FormControlLabel isError={Boolean(errors.name)}  htmlFor="name">Your name</FormControlLabel>
               </FormControlLabelWrapper>
             : ''}
-          <FormControlField isError={Boolean(errors.name)} placeholder="Your name" {...register("name", { required: true, pattern: /^(?![0-9_$*&?,%]*$)/ })} id="name"/>
+          <FormControlField isError={Boolean(errors.name)} placeholder="Your name" {...register("name", { 
+            required: true,
+            minLength: 2,
+            maxLength: 60,
+            pattern: /^(?![0-9_$*&?,%]*$)/ 
+          })} id="name"/>
           {errors.name && <FormControlError>This field value is not valid</FormControlError>}
         </FormControl>
         <FormControl>
@@ -110,7 +176,7 @@ export const Form = () => {
             placeholder="Phone"
             {...register("phone", {
               required: true,
-              pattern: /([+]?[0-9]{2})[0-9]{3}[0-9]{7}/ 
+              pattern: /^(\+380\d{9})$/
             })}
             id="phone"
             name="phone"
@@ -126,9 +192,9 @@ export const Form = () => {
             <FormPositionsListItem key={id}>
               <FormRadio>
                 <FormRadioHidden 
-                  {...register("position", { required: true })}
+                  {...register("position_id", { required: true })}
                   value={id}
-                  name="position"
+                  name="position_id"
                   defaultChecked={index === 0}
                   type="radio"
                   id={id}>
@@ -148,15 +214,18 @@ export const Form = () => {
           <FormControlField
             type="file"
             isHidden={true}
-            {...register("file", { required: true } )}
+            {...register("photo", { required: true } )}
             id="avatar"
             onChange={(event) => checkImageSize(event)}
-            accept="image/png, image/jpeg"
+            accept="image/jpg, image/jpeg"
           />
         </FormControlInner>
-        {errors.file && <FormControlError>This field value is not valid</FormControlError>}
+        {errors.photo && <FormControlError>This field value is not valid</FormControlError>}
+        {fileSizeError && <FormControlError>File size more than 5mb</FormControlError>}
         </FormControl>
-      <Button>Sign up</Button>
+      <FormWrapperButton>
+        <Button disabled={thereIsFieldWithError}>Sign up</Button>
+      </FormWrapperButton>
     </FormStyles>
   );
 };  

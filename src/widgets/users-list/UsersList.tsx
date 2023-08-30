@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react"
 import { UserListWrapper, UsersListStyled, UserListItem } from "./UsersListStyles"
-import { User } from "../../types"
+import { UserGet } from "../../types"
 import userService from "../../shared/services/user.service"
 import { UserWidget } from "../../entities/User"
 import { Button } from "../../shared/UI"
+import { useUsers } from '../../shared/state/UserState'
 
 export const UsersList = () => {
-  const [usersArray, setUsers] = useState<User[]>([])
+  const [usersArray, setUsers] = useState<UserGet[]>([])
   const [nextUrl, setNextUrl] = useState<string>();
+  const [isHideButton, setIsHideButton] = useState<boolean>(false);
   const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false);
-  
-  const sortUsers = (array: User[]) => {
-    const sortedArray = array.sort((x: User, y: User) => x.registration_timestamp - y.registration_timestamp);
+  const userState = useUsers(state => state.users);
+
+  const sortUsers = (array: UserGet[]) => {
+    const sortedArray = array.sort((x: UserGet, y: UserGet) => x.registration_timestamp - y.registration_timestamp);
     return sortedArray;
   };
 
-  const updateUsers = (newUsers: User[]) => {
+  const updateUsers = (newUsers: UserGet[]) => {
     const updatedUsers = usersArray.concat(newUsers);
     setUsers(sortUsers(updatedUsers));
   };
@@ -34,11 +37,18 @@ export const UsersList = () => {
           return;
         }
 
+        const { page, total_pages } = data.data;
         const index = next_url.lastIndexOf('?');
         const partOfNextLink = next_url.substring(index, next_url.length);
 
         updateUsers(users);
         setNextUrl(partOfNextLink);
+
+        if (page < total_pages) {
+          return;
+        }
+
+        setIsHideButton(true);
       } catch(e) {
         console.error(e);
       }
@@ -49,6 +59,12 @@ export const UsersList = () => {
     getUsers();
   }, [])
 
+  useEffect(() => {  
+    const users = sortUsers(userState);
+    const sortedUsersDesc = [...users].sort((user1, user2) => user2.registration_timestamp - user1.registration_timestamp);
+    setUsers(sortedUsersDesc);
+  }, [userState]);
+
   return(
     <UserListWrapper>
       <UsersListStyled>
@@ -58,7 +74,8 @@ export const UsersList = () => {
           </UserListItem>
         )}
       </UsersListStyled>
-      <Button onClick={getUsers} disabled={isButtonDisabled}>Show more</Button>
+
+      {!isHideButton && <Button onClick={getUsers} disabled={isButtonDisabled}>Show more</Button>}
     </UserListWrapper>
   )
 }

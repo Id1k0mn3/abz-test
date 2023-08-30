@@ -28,6 +28,7 @@
 
 
 body {
+  font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   margin: 0;
   background-color: var(--ui-var-lightgrey);

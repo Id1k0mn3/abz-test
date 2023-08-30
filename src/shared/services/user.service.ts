@@ -1,6 +1,6 @@
 import http from '../../http-common';
 import { AxiosResponse } from 'axios';
-import { User, UserPosition } from '../../types';
+import { UserGet, UserCreate, UserPosition } from '../../types';
 
 interface UserResponseLinks {
   next_url: string,
@@ -14,7 +14,7 @@ interface UserResponse {
   success: boolean;
   total_pages: number;
   total_users: number;
-  users: User[];
+  users: UserGet[];
 }
 
 interface UserPositionsResponse {
@@ -22,13 +22,24 @@ interface UserPositionsResponse {
   positions: UserPosition[];
 }
 
-class UserServices {
+interface UserConfig {
+  Token: string,
+}
+
+class UserServices {  
   getUsers(next_url = '?page=1&count=6'): Promise<AxiosResponse<UserResponse>> {
     return http.get(`/users${next_url}`);
   }
 
-  createUser(data: User): Promise<AxiosResponse<User>> {
-    return http.post('/user', data);
+  createUser(data: UserCreate, config: UserConfig): Promise<AxiosResponse<UserCreate>> {
+
+    const requestConfig = {
+      headers: {
+        Token: config.Token
+      }
+    };
+
+    return http.post('/users', data, requestConfig);
   }
 
   getUserPositions(): Promise<AxiosResponse<UserPositionsResponse>> {

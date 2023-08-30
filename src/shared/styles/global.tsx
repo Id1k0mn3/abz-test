@@ -27,7 +27,7 @@ export const globalStyles = createGlobalStyle`
     min-height: 100vh;
     margin: 0;
     font-weight: 400;
-    font-size: 1rem;
+    font-size: 16px;
     line-height: calc(26 / 16);
   }
 `
