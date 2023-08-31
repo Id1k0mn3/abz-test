@@ -14,6 +14,10 @@ interface PrependElement {
   isError?: boolean;
 }
 
+interface FormControlMessage {
+  isSuccess?: boolean;
+}
+
 
 export const FormStyles = styled.form`
   display: flex;
@@ -77,8 +81,8 @@ export const FormControlField = styled.input<FieldProps>`
   }
 `;
 
-export const FormControlError = styled.span`
-  color: var(--ui-var-red);
+export const FormControlMessage = styled.span<FormControlMessage>`
+  color: ${(props) => props.isSuccess ? 'var(--ui-var-green)' : 'var(--ui-var-red)'};
   font-weight: 400;
   font-size: .75rem;
   line-height: calc(14 / 12);
@@ -98,7 +102,7 @@ export const FormPositionGroupTitle = styled(Paragraph)`
 `;
 
 export const FormControlHint = styled(FormControlLabel)`
-  padding-left: .75rem;
+  padding-left: 1rem;
   font-weight: 400;
 `;
 

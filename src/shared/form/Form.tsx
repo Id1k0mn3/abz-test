@@ -6,6 +6,7 @@ import { UserPosition } from "../../types";
 import { Button } from "../UI";
 import { useUsers } from '../state/UserState';
 import { useFormState } from '../state/FormState';
+
 import {
   FormStyles,
   FormControl,
@@ -13,7 +14,7 @@ import {
   FormControlField,
   FormControlLabel,
   FormControlLabelWrapper,
-  FormControlError,
+  FormControlMessage,
   FormControlHint,
   FormPositionGroup,
   FormPositionGroupTitle,
@@ -34,23 +35,19 @@ type Inputs = {
   phone: string,
   email: string,
   position_id: string,
-  photo: File | undefined,
-};
-
-interface UserPositionsResponse {
-  positions: UserPosition[];
+  photo: File | boolean |undefined,
 };
 
 export const Form = () => {
   const MAX_FILE_SIZE = (1024 * 1024) * 5;
   const [userToken, setUserToken] = useState<string>('');
   const [blobImage, setBlobImage] = useState<File>();
-  const [fileSizeError, setfileSizeError] = useState<boolean>(false);
+  // const [fileSizeError, setfileSizeError] = useState<boolean>(false);
   const [userPositions, setUserPositions] = useState<UserPosition[]>([]);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
+  const { register, handleSubmit, watch, formState: { errors, isValid }, setError, clearErrors } = useForm<Inputs>();
   const thereIsFieldWithError: boolean = !!errors.email || !!errors.photo || !!errors.name || !!errors.phone;
   const updateUsers = useUsers(state => state.updateUsers)
-  const updateFormState =useFormState(state => state.uspdateIsSubmitted)
+  const updateFormState = useFormState(state => state.uspdateIsSubmitted)
   
   const name = watch('name');
   const email = watch('email');
@@ -74,37 +71,66 @@ export const Form = () => {
 
   const checkImageSize = (event: FormEvent<HTMLInputElement>) => {
     const reader = new FileReader();
+
+    if (!event.target) {
+      return;
+    }
+
     const { files } = event.target as HTMLInputElement;
+
+    if (!files || !files.length) {
+      return;
+    }
+
     const file = files[0];
 
     if (file.size > MAX_FILE_SIZE) {
-      setfileSizeError(true);
+      setError('photo', {
+        type: 'manual',
+        message: 'Your image more than 5mb'
+      });
       return
     }
-    
-    setfileSizeError(false);
 
     reader.onloadend = (readerEvent) => {
       const image = new Image();
-      const { result } = readerEvent.target;
-      image.src = result;
 
-      image.onload = function() {
-        if (image.width < 70 && image.height < 70) {
-          return;
-        }
-      };
-      
-      const imageBlobData = (image.src).split(',')[1];
-
-      if (!imageBlobData) {
-        console.error('problem with convert image.src to image blob data');
+      if (!readerEvent || !readerEvent.target) {
         return;
       }
 
-      setBlobImage(file);
-    };
+      const { result } = readerEvent.target;
 
+      if (!result) {
+        return;
+      }
+
+      // for checking type of image
+      const resultString = typeof result === 'string' ? result : new TextDecoder().decode(result);
+
+      image.src = resultString;
+
+      image.onload = function() {
+        if (image.width < 70 || image.height < 70) {
+          setError('photo', {
+            type: 'manual',
+            message: 'Your image smaller than 70x70'
+          });
+          return;
+        }
+
+        const imageBlobData = (image.src).split(',')[1];
+        console.log(imageBlobData);
+        if (!imageBlobData) {
+          console.error('problem with convert image.src to image blob data');
+          return;
+        }
+
+        setBlobImage(file);
+        clearErrors('photo');
+        // errors.photo = false;
+      };
+    };
     reader.readAsDataURL(file);
   };
 
@@ -116,12 +142,14 @@ export const Form = () => {
   };
 
   const onSubmit: SubmitHandler<Inputs> = async data => {
+    console.log(isValid);
+
     try {
       const formData  = new FormData();
       data.photo = blobImage;
         
       for(const name in data) {
-        formData.append(name, data[name]);
+        formData.append(name, data[name as keyof Inputs] as string);
       }
 
       await userService.createUser(formData, { Token: userToken})
@@ -148,10 +176,10 @@ export const Form = () => {
             maxLength: 60,
             pattern: /^(?![0-9_$*&?,%]*$)/ 
           })} id="name"/>
-          {errors.name && <FormControlError>This field value is not valid</FormControlError>}
+          {errors.name && <FormControlMessage>This field value is not valid</FormControlMessage>}
         </FormControl>
         <FormControl>
-          {email 
+          {email
             ? <FormControlLabelWrapper>
                 <FormControlLabel isError={Boolean(errors.email)} htmlFor="email">Email</FormControlLabel>
               </FormControlLabelWrapper> 
@@ -165,7 +193,7 @@ export const Form = () => {
             })}
             id="email"
           />
-          {errors.email && <FormControlError>This field value is not valid</FormControlError>}
+          {errors.email && <FormControlMessage>This field value is not valid</FormControlMessage>}
         </FormControl>
         <FormControl>
           {phone
@@ -183,7 +211,7 @@ export const Form = () => {
             id="phone"
             name="phone"
           />
-          {errors.phone && <FormControlError>This field value is not valid</FormControlError>}
+          {errors.phone && <FormControlMessage>This field value is not valid</FormControlMessage>}
           <FormControlHint>+38 (XXX) XXX - XX - XX</FormControlHint>
         </FormControl>
       </FormGroup>
@@ -199,9 +227,9 @@ export const Form = () => {
                   name="position_id"
                   defaultChecked={index === 0}
                   type="radio"
-                  id={id}>
+                  id={`position-${id}`}>
                 </FormRadioHidden>
-                <FormRadioLabel htmlFor={id}>{name}</FormRadioLabel>
+                <FormRadioLabel htmlFor={`position-${id}`}>{name}</FormRadioLabel>
               </FormRadio>
             </FormPositionsListItem>
           )}
@@ -209,21 +237,23 @@ export const Form = () => {
       </FormPositionGroup>
       <FormControl>
         <FormControlInner>
-          <FormControlPrependElement isError={Boolean(errors.file)}>Upload</FormControlPrependElement>
-          <FormControlCustomFileField isError={Boolean(errors.file)} htmlFor="avatar">
+          <FormControlPrependElement isError={Boolean(errors.photo)}>Upload</FormControlPrependElement>
+          <FormControlCustomFileField isError={Boolean(errors.photo)} htmlFor="avatar">
             <FormControlCustomPlaceholder>Upload your photo</FormControlCustomPlaceholder>
           </FormControlCustomFileField>
           <FormControlField
             type="file"
+            isError={Boolean(errors.photo)}
             isHidden={true}
             {...register("photo", { required: true } )}
             id="avatar"
             onChange={(event) => checkImageSize(event)}
             accept="image/jpg, image/jpeg"
+            name="photo"
           />
         </FormControlInner>
-        {errors.photo && <FormControlError>This field value is not valid</FormControlError>}
-        {fileSizeError && <FormControlError>File size more than 5mb</FormControlError>}
+        {errors.photo && <FormControlMessage>{errors.photo.message}</FormControlMessage>}
+        {blobImage && <FormControlMessage isSuccess={true}>Message was added successfuly</FormControlMessage>}
         </FormControl>
       <FormWrapperButton>
         <Button disabled={thereIsFieldWithError}>Sign up</Button>

@@ -8,6 +8,8 @@ export const Button = styled.button`
   font-weight: 400;
   font-size: 1rem;
   line-height: calc(26 / 16);
+  text-align: center;
+  text-decoration: none;
   border: none;
   border-radius: 80px;
   cursor: pointer;
@@ -24,4 +26,8 @@ export const Button = styled.button`
     color: var(--ui-base-white);
     pointer-events: none;
   }
+`;
+
+export const ButtonLG = styled(Button)`
+  width: 120px;
 `;

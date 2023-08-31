@@ -1,8 +1,8 @@
 import { UserStyled, UserImageWrapper, UserImage, UserTextContent  } from "./UserStyles"
-import { User } from "../types"
+import { UserGet } from "../types"
 import { Paragraph } from "../shared/UI"
 
-export const UserWidget: React.FC<User> = (props) => {
+export const UserWidget: React.FC<UserGet> = (props) => {
   return(
     <UserStyled>
       <UserImageWrapper>

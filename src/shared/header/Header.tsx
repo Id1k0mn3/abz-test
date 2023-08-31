@@ -1,8 +1,8 @@
 import React from "react"
 import { Container } from "../styles/Container"
 import { HeaderStyles, HeaderContent, HeaderActions } from "./HeaderStyles"
-import { Button } from "../UI/UiButton"
 import logo from '../../assets/logo.svg';
+import { Button } from '../UI';
 
 export const Header: React.FC = () => {
   return(
@@ -11,8 +11,8 @@ export const Header: React.FC = () => {
         <HeaderContent>
           <img src={logo} alt="logo" />
           <HeaderActions>
-            <Button>Users</Button>
-            <Button>Sign up</Button>
+            <Button as='a' href='#section-users'>Users</Button>
+            <Button as='a' href='#section-form'>Sign up</Button>
           </HeaderActions>
         </HeaderContent>
       </Container>

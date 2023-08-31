@@ -10,7 +10,7 @@ import { useFormState } from '../shared/state/FormState'
 export const HomePage: React.FC = () => {
   const formState = useFormState(state => state.isSubmitted);
   const [isFormSubmited, setIsFormSubmited] = useState<boolean>(false);
-  console.log(isFormSubmited)
+
   const renderSuccessMessage = () => (isFormSubmited ? <SuccessMessage/> : '' )
   const renderForm = () => (isFormSubmited ? '' : <FormSection/> )
 

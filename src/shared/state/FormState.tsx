@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 
-export const useFormState = create((set) => ({
+interface UserState {
+  isSubmitted: boolean;
+  uspdateIsSubmitted: (submit: boolean) => void;
+}
+
+export const useFormState = create<UserState>((set) => ({
   isSubmitted: false,
-  uspdateIsSubmitted: (submit: boolean) => set({isSubmitted: submit})
+  uspdateIsSubmitted: (submit) => set({isSubmitted: submit})
 }))

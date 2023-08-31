@@ -4,9 +4,9 @@ import { Container } from "../styles/Container"
 import { Form } from "./Form"
 export const FormSection = () => {
   return(
-    <FormSectionStyled>
-      <Heading>Working with POST request</Heading>
+    <FormSectionStyled id='section-form'>
       <Container hasPaddings={true}>
+        <Heading>Working with POST request</Heading>
         <Form />
       </Container>
     </FormSectionStyled>

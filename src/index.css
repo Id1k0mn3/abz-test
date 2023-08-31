@@ -17,6 +17,7 @@
   --ui-var-darkgrey-2: #7E7E7E;
 
   --ui-var-red: #CB3D40;
+  --ui-var-green: #43d551;
 }
 
 * {
@@ -35,6 +36,7 @@ body {
   font-weight: 400;
   font-size: 1rem;
   line-height: calc(26 / 16);
+  scroll-behavior: smooth;
 }
 
 li {

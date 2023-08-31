@@ -5,9 +5,9 @@ import { Container } from "../styles/Container"
 
 export const UsersSection = () => {
   return(
-    <UsersSectionStyled>
-      <Heading>Working with GET request</Heading>
+    <UsersSectionStyled id='section-users'>
       <Container hasPaddings={true}>
+        <Heading>Working with GET request</Heading>
         <UsersList></UsersList>
       </Container>
     </UsersSectionStyled>

@@ -4,7 +4,7 @@ import successMessage from '../../assets/successImage.svg'
 
 export const SuccessMessage = () => {
   return(
-    <ELementSuccessMessage>
+    <ELementSuccessMessage id='section-form'>
       <Heading>User successfully registered</Heading>
       <SuccessImage src={successMessage} alt="success image" />
     </ELementSuccessMessage>

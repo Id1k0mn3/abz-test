@@ -1,7 +1,13 @@
 import { create } from 'zustand';
 import { UserGet } from '../../types';
 
-export const useUsers = create( (set) => ({
+
+interface UserState {
+  users: UserGet[];
+  updateUsers: (sortedUsers: UserGet[]) => void;
+}
+
+export const useUsers = create<UserState>((set) => ({
   users: [],
-  updateUsers: (sortedUsers:UserGet) => set({ users: sortedUsers }),
+  updateUsers: (sortedUsers) => set({ users: sortedUsers }),
 }));

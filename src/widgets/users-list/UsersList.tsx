@@ -3,22 +3,23 @@ import { UserListWrapper, UsersListStyled, UserListItem } from "./UsersListStyle
 import { UserGet } from "../../types"
 import userService from "../../shared/services/user.service"
 import { UserWidget } from "../../entities/User"
-import { Button } from "../../shared/UI"
+import { ButtonLG } from "../../shared/UI"
 import { useUsers } from '../../shared/state/UserState'
 
 export const UsersList = () => {
   const [usersArray, setUsers] = useState<UserGet[]>([])
   const [nextUrl, setNextUrl] = useState<string>();
   const [isHideButton, setIsHideButton] = useState<boolean>(false);
-  const userState = useUsers(state => state.users);
+  const userState = useUsers((state) => state.users);
 
   const sortUsers = (array: UserGet[]) => {
-    const sortedArray = array.sort((x: UserGet, y: UserGet) => x.registration_timestamp - y.registration_timestamp);
-    return sortedArray;
+    const sortedUsers = [...array].sort((user1, user2) => user2.registration_timestamp - user1.registration_timestamp);
+    return sortedUsers;
   };
 
   const updateUsers = (newUsers: UserGet[]) => {
     const updatedUsers = usersArray.concat(newUsers);
+
     setUsers(sortUsers(updatedUsers));
   };
 
@@ -59,9 +60,7 @@ export const UsersList = () => {
   }, [])
 
   useEffect(() => {  
-    const users = sortUsers(userState);
-    const sortedUsersDesc = [...users].sort((user1, user2) => user2.registration_timestamp - user1.registration_timestamp);
-    setUsers(sortedUsersDesc);
+    setUsers(sortUsers(userState));
     setIsHideButton(false)
   }, [userState]);
 
@@ -75,7 +74,7 @@ export const UsersList = () => {
         )}
       </UsersListStyled>
 
-      {!isHideButton && <Button onClick={getUsers}>Show more</Button>}
+      {!isHideButton && <ButtonLG onClick={getUsers}>Show more</ButtonLG>}
     </UserListWrapper>
   )
 }

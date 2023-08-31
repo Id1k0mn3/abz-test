@@ -31,7 +31,7 @@ class UserServices {
     return http.get(`/users${next_url}`);
   }
 
-  createUser(data: UserCreate, config: UserConfig): Promise<AxiosResponse<UserCreate>> {
+  createUser(data: FormData, config: UserConfig): Promise<AxiosResponse<UserCreate>> {
 
     const requestConfig = {
       headers: {

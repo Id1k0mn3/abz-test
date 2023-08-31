@@ -17,7 +17,7 @@ export const BannerImage = styled.img`
 
 export const BannerContent = styled.div`
   position: absolute;
-  top: 50%;
+  top: 40px;
   left: 50%;
   display: flex;
   flex-wrap: wrap;
@@ -26,10 +26,12 @@ export const BannerContent = styled.div`
   max-width: 328px;
   width: 100%;
   row-gap: 2rem;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 
   @media (min-width: 768px) {
+    top: 50%;
     max-width: 380px;
+    transform: translate(-50%, -50%);
   }
 `;
 
