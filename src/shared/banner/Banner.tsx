@@ -1,6 +1,6 @@
 import React from "react"
 import { Container } from "../styles/Container"
-import banner from '../../assets/banner.png';
+import banner from '../../assets/banner.webp';
 import { Banner, BannerImage, BannerContent, BannerTextContent } from "./BannerStyles";
 import { Button, Heading, Paragraph, CSSVariables } from "../UI";
 export const BannerSection: React.FC = () => {

@@ -3,5 +3,7 @@ import { HomePage } from './pages/HomePage'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <HomePage />
+  <div className="root-app">
+    <HomePage />
+  </div>
 )

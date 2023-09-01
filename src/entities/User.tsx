@@ -6,7 +6,7 @@ export const UserWidget: React.FC<UserGet> = (props) => {
   return(
     <UserStyled>
       <UserImageWrapper>
-        <UserImage src={props.photo}/>
+        <UserImage src={props.photo} width="70" height="70" alt="user avatar"/>
       </UserImageWrapper>
       <UserTextContent>
         <Paragraph isCropedText={true}>{props.name}</Paragraph>
