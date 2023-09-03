@@ -44,15 +44,15 @@ export const Form = () => {
   const [blobImage, setBlobImage] = useState<File>();
   // const [fileSizeError, setfileSizeError] = useState<boolean>(false);
   const [userPositions, setUserPositions] = useState<UserPosition[]>([]);
-  const { register, handleSubmit, watch, formState: { errors, isValid }, setError, clearErrors } = useForm<Inputs>();
+  const { register, handleSubmit, watch, formState: { errors }, setError, clearErrors } = useForm<Inputs>();
   const thereIsFieldWithError: boolean = !!errors.email || !!errors.photo || !!errors.name || !!errors.phone;
-  const updateUsers = useUsers(state => state.updateUsers)
-  const updateFormState = useFormState(state => state.uspdateIsSubmitted)
-  
   const name = watch('name');
   const email = watch('email');
   const phone = watch('phone');
-  
+  const thereIsEmptyFields: boolean = !name || !email || !phone || !blobImage;
+  const updateUsers = useUsers(state => state.updateUsers)
+  const updateFormState = useFormState(state => state.uspdateIsSubmitted)
+
   useEffect(() => {
     globalService.getToken()
       .then(({ data: { token } }) => {
@@ -120,7 +120,7 @@ export const Form = () => {
         }
 
         const imageBlobData = (image.src).split(',')[1];
-        console.log(imageBlobData);
+
         if (!imageBlobData) {
           console.error('problem with convert image.src to image blob data');
           return;
@@ -142,8 +142,6 @@ export const Form = () => {
   };
 
   const onSubmit: SubmitHandler<Inputs> = async data => {
-    console.log(isValid);
-
     try {
       const formData  = new FormData();
       data.photo = blobImage;
@@ -253,10 +251,10 @@ export const Form = () => {
           />
         </FormControlInner>
         {errors.photo && <FormControlMessage>{errors.photo.message}</FormControlMessage>}
-        {blobImage && <FormControlMessage isSuccess={true}>Message was added successfuly</FormControlMessage>}
+        {blobImage && !errors.photo && <FormControlMessage isSuccess={true}>Message was added successfuly</FormControlMessage>}
         </FormControl>
       <FormWrapperButton>
-        <Button disabled={thereIsFieldWithError}>Sign up</Button>
+        <Button disabled={thereIsFieldWithError || thereIsEmptyFields}>Sign up</Button>
       </FormWrapperButton>
     </FormStyles>
   );
